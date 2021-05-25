@@ -1,4 +1,4 @@
-package br.net.gits.febraban.services.implementations;
+package br.net.gits.febraban.api.controller.stub;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -78,6 +78,14 @@ public class EstadosServiceStub {
 							.findFirst().orElseThrow(() -> new NaoEncontradoException("Stub Exception"));
 
 					return estadoEncontrado;
+				}
+
+				@Override
+				public void remover(Integer id) throws NaoEncontradoException, NegocioException {
+					var estadoEncontrado = estadosRepository.stream().filter(item -> item.getId().equals(id))
+							.findFirst().orElseThrow(() -> new NaoEncontradoException("Stub Exception"));
+
+					estadosRepository.remove(estadoEncontrado);
 				}
 			};
 		return this.stub;

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.net.gits.febraban.persistence.entities.Estado;
-import br.net.gits.febraban.persistence.repositories.EstadosRepository;
+import br.net.gits.febraban.persistence.repositories.IEstadosRepository;
 import br.net.gits.febraban.services.IEstadosService;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
 import br.net.gits.febraban.services.exception.NaoEncontradoException;
@@ -17,9 +17,9 @@ import br.net.gits.febraban.utils.ModelMapperUtils;
 @Service
 public class EstadosServiceImpl implements IEstadosService {
 
-	private EstadosRepository estadosRepository;
+	private IEstadosRepository estadosRepository;
 
-	public EstadosServiceImpl(EstadosRepository estadosRepository) {
+	public EstadosServiceImpl(IEstadosRepository estadosRepository) {
 		this.estadosRepository = estadosRepository;
 	}
 
@@ -72,6 +72,18 @@ public class EstadosServiceImpl implements IEstadosService {
 				.orElseThrow(() -> new NaoEncontradoException("Estado nao cadastrado"));
 
 		return ModelMapperUtils.to(existente, EstadoDTO.class);
+	}
+
+	@Override
+	public void remover(Integer id) throws NaoEncontradoException, NegocioException {
+
+		var existente = this.estadosRepository.findById(id)
+				.orElseThrow(() -> new NaoEncontradoException("Estado nao cadastrado"));
+
+		if (existente.getCidade().size() > 0)
+			throw new NegocioException("Estado nao cadastrado");
+
+		this.estadosRepository.deleteById(id);
 	}
 
 }

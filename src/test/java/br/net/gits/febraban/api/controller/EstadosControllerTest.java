@@ -1,6 +1,7 @@
 package br.net.gits.febraban.api.controller;
 
 import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.not;
 
@@ -13,8 +14,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.web.servlet.MockMvc;
 
+import br.net.gits.febraban.api.controller.stub.EstadosServiceStub;
 import br.net.gits.febraban.api.controller.utils.TestUtils;
-import br.net.gits.febraban.services.implementations.EstadosServiceStub;
 import io.restassured.http.ContentType;
 import io.restassured.module.mockmvc.RestAssuredMockMvc;
 

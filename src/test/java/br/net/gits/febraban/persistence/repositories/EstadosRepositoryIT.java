@@ -17,10 +17,10 @@ import br.net.gits.febraban.persistence.entities.Estado;
 
 @ExtendWith(SpringExtension.class)
 @DataJpaTest
-public class EstadosRepositoryTest {
+public class EstadosRepositoryIT {
 
 	@Autowired
-	private EstadosRepository estadosRepository;
+	private IEstadosRepository estadosRepository;
 
 	@BeforeEach
 	public void setUp() {

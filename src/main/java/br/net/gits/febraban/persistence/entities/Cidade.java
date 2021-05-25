@@ -1,10 +1,8 @@
 package br.net.gits.febraban.persistence.entities;
 
-import java.util.List;
-
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToOne;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -12,17 +10,14 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class Estado {
+public class Cidade {
 
 	@EqualsAndHashCode.Include
 	@Id
 	private Integer id;
 
-	private String codigo;
-
 	private String nome;
 
-	@OneToMany(mappedBy = "estado")
-	private List<Cidade> cidade;
-
+	@ManyToOne
+	private Estado estado;
 }

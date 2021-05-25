@@ -14,6 +14,8 @@ public interface IEstadosService {
 
 	public EstadoDTO adicionar(EstadoDTO estado) throws NegocioException;
 
+	public void remover(Integer id) throws NaoEncontradoException, NegocioException;
+
 	public EstadoDTO salvar(Integer id, EstadoDTO estado) throws NaoEncontradoException;
 
 	public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) throws NegocioException;
