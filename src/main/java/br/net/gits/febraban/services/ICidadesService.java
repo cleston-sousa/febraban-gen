@@ -8,7 +8,7 @@ import br.net.gits.febraban.services.exception.NegocioException;
 
 public interface ICidadesService {
 
-	public List<CidadeDTO> listarTodos();
+	public List<CidadeDTO> listarTodas();
 
 	public CidadeDTO obterPorId(Integer id) throws NaoEncontradoException;
 

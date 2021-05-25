@@ -39,43 +39,43 @@ public class EstadosServiceImplTest {
 
 	@Test
 	void givenEstadoDTO_whenAdicionar_thenReturnEstadoDTO() {
+		var estado = new Estado();
+		estado.setCodigo("TT");
+		estado.setNome("Teste");
+
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
 		.thenReturn(Optional.empty());
 		
 		when(this.estadosRepository.save(any()))
-			.thenReturn(new Estado());
+			.thenReturn(estado);
 		// @formatter:on
 
-		var id = 100;
-		var estadoDTO = EstadoDTO.builder().id(id).codigo("TT").nome("Teste").build();
+		var estadoId = 100;
+		var estadoDTO = EstadoDTO.builder().id(estadoId).codigo("TT").nome("Teste").build();
 
 		var result = this.estadosService.adicionar(estadoDTO);
 
-		verify(this.estadosRepository, times(1)).findById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
 		verify(this.estadosRepository, times(1)).save(any());
-		assertThat(result).isInstanceOf(EstadoDTO.class);
+
+		assertThat(result).isNotNull();
+		assertEquals(estadoDTO.getCodigo(), result.getCodigo());
+		assertEquals(estadoDTO.getNome(), result.getNome());
 	}
 
 	@Test
 	void givenEstadoDTO_withIdRepetido_whenAdicionar_thenThrowsNegocioException() {
 		// @formatter:off
-		when(this.estadosRepository.save(any()))
-			.thenReturn(new Estado());
-
 		when(this.estadosRepository.findById(any()))
-			.thenReturn(Optional.empty())
 			.thenReturn(Optional.of(new Estado()));
 		// @formatter:on
 
 		var estadoDTO = EstadoDTO.builder().id(1).codigo("TT").nome("Teste").build();
 
-		this.estadosService.adicionar(estadoDTO);
-
 		assertThrows(NegocioException.class, () -> {
 			this.estadosService.adicionar(estadoDTO);
 		});
-
 	}
 
 	@Test
@@ -98,23 +98,27 @@ public class EstadosServiceImplTest {
 
 	@Test
 	void givenEstadoIdAndEstadoDTO_whenSalvar_thenReturnEstadoDTO() {
+		var estado = new Estado();
+		estado.setCodigo("ZZ");
+		estado.setNome("ZZZZZZ");
+
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
-			.thenReturn(Optional.of(new Estado()));
+			.thenReturn(Optional.of(estado));
 
 		when(this.estadosRepository.save(any()))
 			.thenReturn(new Estado());
 		// @formatter:on
 
-		var id = 100;
+		var estadoId = 100;
 		var estadoDTO = EstadoDTO.builder().codigo("TT").nome("Teste").build();
 
-		var result = this.estadosService.salvar(id, estadoDTO);
+		var result = this.estadosService.salvar(estadoId, estadoDTO);
 
-		verify(this.estadosRepository, times(1)).findById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
 		verify(this.estadosRepository, times(1)).save(any());
-		assertThat(result).isInstanceOf(EstadoDTO.class);
 
+		assertThat(result).isNotNull();
 		assertEquals(estadoDTO.getCodigo(), result.getCodigo());
 		assertEquals(estadoDTO.getNome(), result.getNome());
 	}
@@ -126,14 +130,14 @@ public class EstadosServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		var id = 100;
+		var estadoId = 100;
 		var estadoDTO = EstadoDTO.builder().codigo("TT").nome("Teste").build();
 
 		assertThrows(NaoEncontradoException.class, () -> {
-			this.estadosService.salvar(id, estadoDTO);
+			this.estadosService.salvar(estadoId, estadoDTO);
 		});
 
-		verify(this.estadosRepository, times(1)).findById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
 		verify(this.estadosRepository, times(0)).save(any());
 	}
 
@@ -156,6 +160,7 @@ public class EstadosServiceImplTest {
 
 		verify(this.estadosRepository, times(3)).findById(any());
 		verify(this.estadosRepository, times(3)).save(any());
+
 		assertEquals(estadosDTO.size(), result.size());
 		assertThat(result.get(0)).isInstanceOf(EstadoDTO.class);
 	}
@@ -186,16 +191,23 @@ public class EstadosServiceImplTest {
 
 	@Test
 	void givenEstadoId_whenObterPorId_thenReturnEstadoDTO() {
+		var estado = new Estado();
+		estado.setCodigo("TT");
+		estado.setNome("Teste");
+
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
-			.thenReturn(Optional.of(new Estado()));
+			.thenReturn(Optional.of(estado));
 		// @formatter:on
 
-		var id = 100;
-		var result = this.estadosService.obterPorId(id);
+		var estadoId = 100;
+		var result = this.estadosService.obterPorId(estadoId);
 
-		verify(this.estadosRepository, times(1)).findById(id);
-		assertThat(result).isInstanceOf(EstadoDTO.class);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
+
+		assertThat(result).isNotNull();
+		assertEquals(estado.getCodigo(), result.getCodigo());
+		assertEquals(estado.getNome(), result.getNome());
 	}
 
 	@Test
@@ -205,12 +217,12 @@ public class EstadosServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		var id = 100;
+		var estadoId = 100;
 		assertThrows(NaoEncontradoException.class, () -> {
-			this.estadosService.obterPorId(id);
+			this.estadosService.obterPorId(estadoId);
 		});
 
-		verify(this.estadosRepository, times(1)).findById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
 	}
 
 	@Test
@@ -222,11 +234,11 @@ public class EstadosServiceImplTest {
 			.thenReturn(Optional.of(estado));
 		// @formatter:on
 
-		var id = 100;
-		this.estadosService.remover(id);
+		var estadoId = 100;
+		this.estadosService.remover(estadoId);
 
-		verify(this.estadosRepository, times(1)).findById(id);
-		verify(this.estadosRepository, times(1)).deleteById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
+		verify(this.estadosRepository, times(1)).deleteById(estadoId);
 	}
 
 	@Test
@@ -236,12 +248,12 @@ public class EstadosServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		var id = 100;
+		var estadoId = 100;
 		assertThrows(NaoEncontradoException.class, () -> {
-			this.estadosService.remover(id);
+			this.estadosService.remover(estadoId);
 		});
 
-		verify(this.estadosRepository, times(1)).findById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
 		verify(this.estadosRepository, never()).deleteById(any());
 	}
 
@@ -254,12 +266,12 @@ public class EstadosServiceImplTest {
 			.thenReturn(Optional.of(estado));
 		// @formatter:on
 
-		var id = 100;
+		var estadoId = 100;
 		assertThrows(NegocioException.class, () -> {
-			this.estadosService.remover(id);
+			this.estadosService.remover(estadoId);
 		});
 
-		verify(this.estadosRepository, times(1)).findById(id);
+		verify(this.estadosRepository, times(1)).findById(estadoId);
 		verify(this.estadosRepository, never()).deleteById(any());
 	}
 }
