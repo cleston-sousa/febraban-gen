@@ -10,14 +10,14 @@ public interface IEstadosService {
 
 	public List<EstadoDTO> listarTodos();
 
-	public EstadoDTO obterPorId(Integer id) throws EntityNotFoundException;
+	public EstadoDTO obterPorId(Integer estadoId) throws EntityNotFoundException;
 
-	public EstadoDTO adicionar(EstadoDTO estado) throws BusinessException;
+	public EstadoDTO adicionar(EstadoDTO estadoDTO) throws BusinessException;
 
-	public void remover(Integer id) throws EntityNotFoundException, BusinessException;
+	public void remover(Integer estadoId) throws EntityNotFoundException, BusinessException;
 
-	public EstadoDTO salvar(Integer id, EstadoDTO estado) throws EntityNotFoundException;
+	public EstadoDTO salvar(Integer estadoId, EstadoDTO estadoDTO) throws EntityNotFoundException;
 
-	public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) throws BusinessException;
+	public List<EstadoDTO> adicionarLista(List<EstadoDTO> listEstadoDTO) throws BusinessException;
 
 }

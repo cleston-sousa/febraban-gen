@@ -358,7 +358,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.of(estado));
 		
 		when(this.cidadesRepository.save(any()))
-			.thenReturn(new Estado());
+			.thenReturn(new Cidade());
 		// @formatter:on
 
 		var result = this.cidadesService.adicionarLista(cidadesDTO);
@@ -382,6 +382,12 @@ public class CidadesServiceImplTest {
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty())
 			.thenReturn(Optional.of(new Cidade()));
+
+		when(this.estadosRepository.findById(any()))
+			.thenReturn(Optional.of(new Estado()));
+
+		when(this.cidadesRepository.save(any()))
+			.thenReturn(new Cidade());
 		// @formatter:on
 
 		assertThrows(BusinessException.class, () -> {
@@ -389,6 +395,7 @@ public class CidadesServiceImplTest {
 		});
 
 		verify(this.cidadesRepository, times(2)).findById(any());
+		verify(this.estadosRepository, times(1)).findById(any());
 		verify(this.cidadesRepository, times(1)).save(any());
 	}
 
@@ -407,6 +414,9 @@ public class CidadesServiceImplTest {
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.of(estado))
 			.thenReturn(Optional.empty());
+		
+		when(this.cidadesRepository.save(any()))
+			.thenReturn(new Cidade());
 		// @formatter:on
 
 		assertThrows(BusinessException.class, () -> {

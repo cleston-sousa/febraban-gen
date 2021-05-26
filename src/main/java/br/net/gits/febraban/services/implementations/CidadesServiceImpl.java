@@ -1,6 +1,7 @@
 package br.net.gits.febraban.services.implementations;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -31,51 +32,75 @@ public class CidadesServiceImpl implements ICidadesService {
 	}
 
 	@Override
-	public CidadeDTO obterPorId(Integer id) {
-		var existente = this.cidadesRepository.findById(id)
+	public CidadeDTO obterPorId(Integer cidadeId) {
+		var cidadePersisted = this.cidadesRepository.findById(cidadeId)
 				.orElseThrow(() -> new EntityNotFoundException("Cidade nao cadastrada"));
-		return ModelMapperUtils.to(existente, CidadeDTO.class);
+		return ModelMapperUtils.to(cidadePersisted, CidadeDTO.class);
 	}
 
 	@Override
-	public CidadeDTO adicionar(CidadeDTO cidade) {
+	public CidadeDTO adicionar(CidadeDTO cidadeDTO) {
 
-		this.cidadesRepository.findById(cidade.getId()).ifPresent((item) -> {
+		this.cidadesRepository.findById(cidadeDTO.getId()).ifPresent((item) -> {
 			throw new BusinessException("Cidade ja cadastrada");
 		});
 
-		this.estadosRepository.findById(cidade.getEstado().getId())
+		this.estadosRepository.findById(cidadeDTO.getEstado().getId())
 				.orElseThrow(() -> new BusinessException("Estado escolhido inconsistente"));
 
-		var novo = ModelMapperUtils.to(cidade, Cidade.class);
+		var cidadeDetached = ModelMapperUtils.to(cidadeDTO, Cidade.class);
 
-		this.cidadesRepository.save(novo);
+		var cidadePersisted = this.cidadesRepository.save(cidadeDetached);
 
-		return ModelMapperUtils.to(novo, CidadeDTO.class);
+		return ModelMapperUtils.to(cidadePersisted, CidadeDTO.class);
 	}
 
 	@Override
-	public CidadeDTO salvar(Integer id, CidadeDTO cidade) {
-		// TODO Auto-generated method stub
-		return null;
+	public CidadeDTO salvar(Integer cidadeId, CidadeDTO cidadeDTO) {
+
+		var cidadePersisted = this.cidadesRepository.findById(cidadeId)
+				.orElseThrow(() -> new EntityNotFoundException("Cidade nao cadastrada"));
+
+		this.estadosRepository.findById(cidadeDTO.getEstado().getId())
+				.orElseThrow(() -> new BusinessException("Estado escolhido inconsistente"));
+
+		cidadeDTO.setId(null);
+
+		ModelMapperUtils.set(cidadePersisted, cidadeDTO);
+
+		this.cidadesRepository.save(cidadePersisted);
+
+		return ModelMapperUtils.to(cidadePersisted, CidadeDTO.class);
 	}
 
 	@Override
 	public CidadeDTO alterarEstado(Integer cidadeId, Integer estadoId) {
-		// TODO Auto-generated method stub
-		return null;
+
+		var cidadePersisted = this.cidadesRepository.findById(cidadeId)
+				.orElseThrow(() -> new EntityNotFoundException("Cidade nao cadastrada"));
+
+		var estadoPersisted = this.estadosRepository.findById(estadoId)
+				.orElseThrow(() -> new BusinessException("Estado escolhido inconsistente"));
+
+		cidadePersisted.setEstado(estadoPersisted);
+
+		this.cidadesRepository.save(cidadePersisted);
+
+		return ModelMapperUtils.to(cidadePersisted, CidadeDTO.class);
 	}
 
 	@Override
-	public void remover(Integer id) {
-		// TODO Auto-generated method stub
+	public void remover(Integer cidadeId) {
+		this.cidadesRepository.findById(cidadeId)
+				.orElseThrow(() -> new EntityNotFoundException("Cidade nao cadastrada"));
 
+		this.cidadesRepository.deleteById(cidadeId);
 	}
 
 	@Override
-	public List<CidadeDTO> adicionarLista(List<CidadeDTO> cidades) {
-		// TODO Auto-generated method stub
-		return null;
+	public List<CidadeDTO> adicionarLista(List<CidadeDTO> listCidadeDTO) {
+		var result = listCidadeDTO.stream().map(item -> this.adicionar(item)).collect(Collectors.toList());
+		return result;
 	}
 
 }

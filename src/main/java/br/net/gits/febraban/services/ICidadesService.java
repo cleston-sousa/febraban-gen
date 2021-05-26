@@ -10,16 +10,16 @@ public interface ICidadesService {
 
 	public List<CidadeDTO> listarTodas();
 
-	public CidadeDTO obterPorId(Integer id) throws EntityNotFoundException;
+	public CidadeDTO obterPorId(Integer cidadeId) throws EntityNotFoundException;
 
-	public CidadeDTO adicionar(CidadeDTO cidade) throws BusinessException;
+	public CidadeDTO adicionar(CidadeDTO cidadeDTO) throws BusinessException;
 
-	public CidadeDTO salvar(Integer id, CidadeDTO cidade) throws EntityNotFoundException, BusinessException;
+	public CidadeDTO salvar(Integer cidadeId, CidadeDTO cidadeDTO) throws EntityNotFoundException, BusinessException;
 
 	public CidadeDTO alterarEstado(Integer cidadeId, Integer estadoId)
 			throws EntityNotFoundException, BusinessException;
 
-	public void remover(Integer id) throws EntityNotFoundException;
+	public void remover(Integer cidadeId) throws EntityNotFoundException;
 
-	public List<CidadeDTO> adicionarLista(List<CidadeDTO> cidades) throws BusinessException;
+	public List<CidadeDTO> adicionarLista(List<CidadeDTO> listCidadeDTO) throws BusinessException;
 }

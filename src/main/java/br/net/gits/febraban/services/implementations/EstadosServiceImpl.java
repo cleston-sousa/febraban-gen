@@ -30,60 +30,60 @@ public class EstadosServiceImpl implements IEstadosService {
 
 	@Override
 	@Transactional
-	public EstadoDTO salvar(Integer id, EstadoDTO estado) {
+	public EstadoDTO salvar(Integer estadoId, EstadoDTO estadoDTO) {
 
-		var existente = this.estadosRepository.findById(id)
+		var estadoPersisted = this.estadosRepository.findById(estadoId)
 				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));
 
-		estado.setId(null);
+		estadoDTO.setId(null);
 
-		ModelMapperUtils.set(existente, estado);
+		ModelMapperUtils.set(estadoPersisted, estadoDTO);
 
-		this.estadosRepository.save(existente);
+		this.estadosRepository.save(estadoPersisted);
 
-		return ModelMapperUtils.to(existente, EstadoDTO.class);
+		return ModelMapperUtils.to(estadoPersisted, EstadoDTO.class);
 	}
 
 	@Override
 	@Transactional
-	public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) {
-		var resultado = estados.stream().map(item -> this.adicionar(item)).collect(Collectors.toList());
-		return resultado;
+	public List<EstadoDTO> adicionarLista(List<EstadoDTO> listEstadoDTO) {
+		var result = listEstadoDTO.stream().map(item -> this.adicionar(item)).collect(Collectors.toList());
+		return result;
 	}
 
 	@Override
 	@Transactional
-	public EstadoDTO adicionar(EstadoDTO estado) {
+	public EstadoDTO adicionar(EstadoDTO estadoDTO) {
 
-		this.estadosRepository.findById(estado.getId()).ifPresent(item -> {
+		this.estadosRepository.findById(estadoDTO.getId()).ifPresent(item -> {
 			throw new BusinessException("Codigo de estado cadastrado");
 		});
 
-		var novo = ModelMapperUtils.to(estado, Estado.class);
+		var estadoDetached = ModelMapperUtils.to(estadoDTO, Estado.class);
 
-		var resultado = this.estadosRepository.save(novo);
+		var estadoPersisted = this.estadosRepository.save(estadoDetached);
 
-		return ModelMapperUtils.to(resultado, EstadoDTO.class);
+		return ModelMapperUtils.to(estadoPersisted, EstadoDTO.class);
 	}
 
 	@Override
-	public EstadoDTO obterPorId(Integer id) {
-		var existente = this.estadosRepository.findById(id)
+	public EstadoDTO obterPorId(Integer estadoId) {
+		var estadoPersisted = this.estadosRepository.findById(estadoId)
 				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));
 
-		return ModelMapperUtils.to(existente, EstadoDTO.class);
+		return ModelMapperUtils.to(estadoPersisted, EstadoDTO.class);
 	}
 
 	@Override
-	public void remover(Integer id) {
+	public void remover(Integer estadoId) {
 
-		var existente = this.estadosRepository.findById(id)
+		var estadoPersisted = this.estadosRepository.findById(estadoId)
 				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));
 
-		if (existente.getCidade().size() > 0)
+		if (estadoPersisted.getCidade().size() > 0)
 			throw new BusinessException("Estado nao cadastrado");
 
-		this.estadosRepository.deleteById(id);
+		this.estadosRepository.deleteById(estadoId);
 	}
 
 }
