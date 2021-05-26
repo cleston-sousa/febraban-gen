@@ -1,5 +1,7 @@
 package br.net.gits.febraban.services.dtos;
 
+import java.util.List;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +20,7 @@ public class EstadoDTO {
 	private String codigo;
 
 	private String nome;
+
+	private List<CidadeDTO> cidades;
 
 }

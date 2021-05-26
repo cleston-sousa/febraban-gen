@@ -24,8 +24,8 @@ import br.net.gits.febraban.persistence.entities.Cidade;
 import br.net.gits.febraban.persistence.entities.Estado;
 import br.net.gits.febraban.persistence.repositories.IEstadosRepository;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
-import br.net.gits.febraban.services.exception.NaoEncontradoException;
-import br.net.gits.febraban.services.exception.NegocioException;
+import br.net.gits.febraban.services.exceptions.BusinessException;
+import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class EstadosServiceImplTest {
@@ -65,7 +65,7 @@ public class EstadosServiceImplTest {
 	}
 
 	@Test
-	void givenEstadoDTO_withIdRepetido_whenAdicionar_thenThrowsNegocioException() {
+	void givenEstadoDTO_withIdRepetido_whenAdicionar_thenThrowsBusinessException() {
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.of(new Estado()));
@@ -73,7 +73,7 @@ public class EstadosServiceImplTest {
 
 		var estadoDTO = EstadoDTO.builder().id(1).codigo("TT").nome("Teste").build();
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.estadosService.adicionar(estadoDTO);
 		});
 	}
@@ -124,7 +124,7 @@ public class EstadosServiceImplTest {
 	}
 
 	@Test
-	void givenEstadoIdAndEstadoDTO_withEstadoIdInexistente_whenSalvar_thenThrowsNaoEncontradoException() {
+	void givenEstadoIdAndEstadoDTO_withEstadoIdInexistente_whenSalvar_thenThrowsEntityNotFoundException() {
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.empty());
@@ -133,7 +133,7 @@ public class EstadosServiceImplTest {
 		var estadoId = 100;
 		var estadoDTO = EstadoDTO.builder().codigo("TT").nome("Teste").build();
 
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.estadosService.salvar(estadoId, estadoDTO);
 		});
 
@@ -166,7 +166,7 @@ public class EstadosServiceImplTest {
 	}
 
 	@Test
-	void givenListOfEstadoDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsNegocioException() {
+	void givenListOfEstadoDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsBusinessException() {
 		// @formatter:off
 		var estadosDTO = Arrays.asList(new EstadoDTO[] { 
 				EstadoDTO.builder().build(),
@@ -181,7 +181,7 @@ public class EstadosServiceImplTest {
 			.thenReturn(new Estado());
 		// @formatter:on
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.estadosService.adicionarLista(estadosDTO);
 		});
 
@@ -211,14 +211,14 @@ public class EstadosServiceImplTest {
 	}
 
 	@Test
-	void givenEstadoId_withEstadoIdInexistente_whenObterPorId_thenThrowsNaoEncontradoException() {
+	void givenEstadoId_withEstadoIdInexistente_whenObterPorId_thenThrowsEntityNotFoundException() {
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
 		var estadoId = 100;
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.estadosService.obterPorId(estadoId);
 		});
 
@@ -242,14 +242,14 @@ public class EstadosServiceImplTest {
 	}
 
 	@Test
-	void givenEstadoId_withEstadoIdInexistente_whenRemover_thenThrowsNaoEncontradoException() {
+	void givenEstadoId_withEstadoIdInexistente_whenRemover_thenThrowsEntityNotFoundException() {
 		// @formatter:off
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
 		var estadoId = 100;
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.estadosService.remover(estadoId);
 		});
 
@@ -258,7 +258,7 @@ public class EstadosServiceImplTest {
 	}
 
 	@Test
-	void givenEstadoId_withEstadoComAoMenosUmaCidade_whenRemover_thenThrowsNegocioException() {
+	void givenEstadoId_withEstadoComAoMenosUmaCidade_whenRemover_thenThrowsBusinessException() {
 		var estado = new Estado();
 		estado.setCidade(new ArrayList<>(Arrays.asList(new Cidade[] { new Cidade() })));
 		// @formatter:off
@@ -267,7 +267,7 @@ public class EstadosServiceImplTest {
 		// @formatter:on
 
 		var estadoId = 100;
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.estadosService.remover(estadoId);
 		});
 

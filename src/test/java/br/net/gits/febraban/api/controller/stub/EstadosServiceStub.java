@@ -1,6 +1,7 @@
 package br.net.gits.febraban.api.controller.stub;
 
 import java.util.ArrayList;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,9 +9,10 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 
 import br.net.gits.febraban.services.IEstadosService;
+import br.net.gits.febraban.services.dtos.CidadeDTO;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
-import br.net.gits.febraban.services.exception.NaoEncontradoException;
-import br.net.gits.febraban.services.exception.NegocioException;
+import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
+import br.net.gits.febraban.services.exceptions.BusinessException;
 
 @TestConfiguration
 public class EstadosServiceStub {
@@ -19,10 +21,10 @@ public class EstadosServiceStub {
 
 	// @formatter:off
 	public static List<EstadoDTO> estadosRepository = new ArrayList<>(Arrays.asList(new EstadoDTO[] {
-			EstadoDTO.builder().id(1).codigo("AA").nome("Teste 1").build(),
-			EstadoDTO.builder().id(2).codigo("BB").nome("Teste 2").build(),
-			EstadoDTO.builder().id(3).codigo("CC").nome("Teste 3").build(),
-			EstadoDTO.builder().id(4).codigo("DD").nome("Teste 4").build()
+			EstadoDTO.builder().id(1).codigo("AA").nome("Teste 1").cidades(new ArrayList<>(Arrays.asList(new CidadeDTO[] {CidadeDTO.builder().build()}))).build(),
+			EstadoDTO.builder().id(2).codigo("BB").nome("Teste 2").cidades(new ArrayList<>(Arrays.asList(new CidadeDTO[] {CidadeDTO.builder().build()}))).build(),
+			EstadoDTO.builder().id(3).codigo("CC").nome("Teste 3").cidades(new ArrayList<>()).build(),
+			EstadoDTO.builder().id(4).codigo("DD").nome("Teste 4").cidades(new ArrayList<>()).build()
 	}));
 	// @formatter:on
 
@@ -32,9 +34,9 @@ public class EstadosServiceStub {
 			this.stub = new IEstadosService() {
 
 				@Override
-				public EstadoDTO salvar(Integer id, EstadoDTO estado) throws NaoEncontradoException {
+				public EstadoDTO salvar(Integer id, EstadoDTO estado) {
 					var estadoEncontrado = estadosRepository.stream().filter(item -> item.getId().equals(id))
-							.findFirst().orElseThrow(() -> new NaoEncontradoException("Stub Exception"));
+							.findFirst().orElseThrow(() -> new EntityNotFoundException("Stub Exception"));
 
 					estadoEncontrado.setCodigo(estado.getCodigo());
 					estadoEncontrado.setNome(estado.getNome());
@@ -48,11 +50,11 @@ public class EstadosServiceStub {
 				}
 
 				@Override
-				public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) throws NegocioException {
+				public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) {
 					estados.stream().forEach((itemA) -> {
 						estadosRepository.stream().filter(item -> item.getId().equals(itemA.getId())).findFirst()
 								.ifPresent((item) -> {
-									throw new NegocioException("Stub Exception");
+									throw new BusinessException("Stub Exception");
 								});
 					});
 
@@ -62,10 +64,10 @@ public class EstadosServiceStub {
 				}
 
 				@Override
-				public EstadoDTO adicionar(EstadoDTO estado) throws NegocioException {
+				public EstadoDTO adicionar(EstadoDTO estado) {
 					estadosRepository.stream().filter(item -> item.getId().equals(estado.getId())).findFirst()
 							.ifPresent((item) -> {
-								throw new NegocioException("Stub Exception");
+								throw new BusinessException("Stub Exception");
 							});
 
 					estadosRepository.add(estado);
@@ -73,17 +75,20 @@ public class EstadosServiceStub {
 				}
 
 				@Override
-				public EstadoDTO obterPorId(Integer id) throws NaoEncontradoException {
+				public EstadoDTO obterPorId(Integer id) {
 					var estadoEncontrado = estadosRepository.stream().filter(item -> item.getId().equals(id))
-							.findFirst().orElseThrow(() -> new NaoEncontradoException("Stub Exception"));
+							.findFirst().orElseThrow(() -> new EntityNotFoundException("Stub Exception"));
 
 					return estadoEncontrado;
 				}
 
 				@Override
-				public void remover(Integer id) throws NaoEncontradoException, NegocioException {
+				public void remover(Integer id) {
 					var estadoEncontrado = estadosRepository.stream().filter(item -> item.getId().equals(id))
-							.findFirst().orElseThrow(() -> new NaoEncontradoException("Stub Exception"));
+							.findFirst().orElseThrow(() -> new EntityNotFoundException("Stub Exception"));
+
+					if (estadoEncontrado.getCidades().size() > 0)
+						throw new BusinessException("Stub Exception");
 
 					estadosRepository.remove(estadoEncontrado);
 				}

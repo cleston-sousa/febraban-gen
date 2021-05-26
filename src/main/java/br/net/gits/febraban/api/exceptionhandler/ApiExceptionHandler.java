@@ -10,14 +10,14 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import br.net.gits.febraban.services.exception.NaoEncontradoException;
-import br.net.gits.febraban.services.exception.NegocioException;
+import br.net.gits.febraban.services.exceptions.BusinessException;
+import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
 
 @ControllerAdvice
 public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(NegocioException.class)
-	public ResponseEntity<?> handleNegocioException(NegocioException ex, WebRequest request) {
+	@ExceptionHandler(BusinessException.class)
+	public ResponseEntity<?> handleBusinessException(BusinessException ex, WebRequest request) {
 
 		HttpStatus status = HttpStatus.BAD_REQUEST;
 
@@ -35,8 +35,8 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		return handleExceptionInternal(ex, errorResponse, new HttpHeaders(), status, request);
 	}
 
-	@ExceptionHandler(NaoEncontradoException.class)
-	public ResponseEntity<?> handleNaoEncontradoException(NaoEncontradoException ex, WebRequest request) {
+	@ExceptionHandler(EntityNotFoundException.class)
+	public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
 
 		HttpStatus status = HttpStatus.NOT_FOUND;
 

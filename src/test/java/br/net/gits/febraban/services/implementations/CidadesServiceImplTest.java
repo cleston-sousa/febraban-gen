@@ -1,6 +1,7 @@
 package br.net.gits.febraban.services.implementations;
 
 import static org.assertj.core.api.Assertions.assertThat;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -25,8 +26,8 @@ import br.net.gits.febraban.persistence.repositories.ICidadesRepository;
 import br.net.gits.febraban.persistence.repositories.IEstadosRepository;
 import br.net.gits.febraban.services.dtos.CidadeDTO;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
-import br.net.gits.febraban.services.exception.NaoEncontradoException;
-import br.net.gits.febraban.services.exception.NegocioException;
+import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
+import br.net.gits.febraban.services.exceptions.BusinessException;
 
 @ExtendWith(MockitoExtension.class)
 public class CidadesServiceImplTest {
@@ -79,14 +80,14 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeId_withCidadeIdInexistente_whenObterPorId_thenThrowsNaoEncontradoException() {
+	void givenCidadeId_withCidadeIdInexistente_whenObterPorId_thenThrowsEntityNotFoundException() {
 		// @formatter:off
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
 		var cidadeId = 100;
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.cidadesService.obterPorId(cidadeId);
 		});
 
@@ -111,8 +112,8 @@ public class CidadesServiceImplTest {
 		// @formatter:on
 
 		var cidadeId = 100;
-		var cidadeDTO = CidadeDTO.builder().id(cidadeId).nome("Teste").estado(EstadoDTO.builder().id(estadoId).build())
-				.build();
+		var cidadeDTO = CidadeDTO.builder().id(cidadeId).nome("Teste")
+					.estado(EstadoDTO.builder().id(estadoId).build()).build();
 
 		var result = this.cidadesService.adicionar(cidadeDTO);
 
@@ -125,7 +126,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeDTO_withCidadeIdRepetido_whenAdicionar_thenThrowsNegocioException() {
+	void givenCidadeDTO_withCidadeIdRepetido_whenAdicionar_thenThrowsBusinessException() {
 		// @formatter:off
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.of(new Cidade()));
@@ -133,7 +134,7 @@ public class CidadesServiceImplTest {
 
 		var cidadeDTO = CidadeDTO.builder().id(1).nome("Teste").build();
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.adicionar(cidadeDTO);
 		});
 
@@ -141,7 +142,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeDTO_withEstadoIdInexistente_whenAdicionar_thenThrowsNegocioException() {
+	void givenCidadeDTO_withEstadoIdInexistente_whenAdicionar_thenThrowsBusinessException() {
 		// @formatter:off
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());
@@ -152,7 +153,7 @@ public class CidadesServiceImplTest {
 
 		var cidadeDTO = CidadeDTO.builder().id(1).nome("Teste").estado(EstadoDTO.builder().id(2).build()).build();
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.adicionar(cidadeDTO);
 		});
 
@@ -190,7 +191,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeIdAndCidadeDTO_withCidadeIdInexistente_whenSalvar_thenThrowsNaoEncontradoException() {
+	void givenCidadeIdAndCidadeDTO_withCidadeIdInexistente_whenSalvar_thenThrowsEntityNotFoundException() {
 		var cidade = new Cidade();
 		cidade.setNome("ZZZZZZZZZZZZ");
 
@@ -201,7 +202,7 @@ public class CidadesServiceImplTest {
 
 		var cidadeId = 100;
 		var cidadeDTO = CidadeDTO.builder().nome("Teste").build();
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.cidadesService.salvar(cidadeId, cidadeDTO);
 		});
 
@@ -210,7 +211,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeIdAndCidadeDTO_withEstadoIdInexistente_whenSalvar_thenThrowsNegocioException() {
+	void givenCidadeIdAndCidadeDTO_withEstadoIdInexistente_whenSalvar_thenThrowsBusinessException() {
 		var estadoId = 55;
 		var cidade = new Cidade();
 		cidade.setNome("ZZZZZZZZZZZZ");
@@ -226,7 +227,7 @@ public class CidadesServiceImplTest {
 		var cidadeId = 100;
 		var cidadeDTO = CidadeDTO.builder().nome("Teste").estado(EstadoDTO.builder().id(estadoId).build()).build();
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.salvar(cidadeId, cidadeDTO);
 		});
 
@@ -269,7 +270,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeIdAndEstadoId_withCidadeIdInexistente_whenAlterarEstado_thenThrowsNaoEncontradoException() {
+	void givenCidadeIdAndEstadoId_withCidadeIdInexistente_whenAlterarEstado_thenThrowsEntityNotFoundException() {
 		var cidadeId = 100;
 		var estadoId = 55;
 
@@ -278,7 +279,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.cidadesService.alterarEstado(cidadeId, estadoId);
 		});
 
@@ -287,7 +288,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeIdAndEstadoId_withEstadoIdInexistente_whenAlterarEstado_thenThrowsNegocioException() {
+	void givenCidadeIdAndEstadoId_withEstadoIdInexistente_whenAlterarEstado_thenThrowsBusinessException() {
 		var cidadeId = 100;
 		var estadoId = 55;
 
@@ -302,7 +303,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.alterarEstado(cidadeId, estadoId);
 		});
 
@@ -326,14 +327,14 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenCidadeId_withCidadeIdInexistente_whenRemover_thenThrowsNaoEncontradoException() {
+	void givenCidadeId_withCidadeIdInexistente_whenRemover_thenThrowsEntityNotFoundException() {
 		// @formatter:off
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
 		var cidadeId = 100;
-		assertThrows(NaoEncontradoException.class, () -> {
+		assertThrows(EntityNotFoundException.class, () -> {
 			this.cidadesService.remover(cidadeId);
 		});
 
@@ -371,7 +372,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenListOfCidadeDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsNegocioException() {
+	void givenListOfCidadeDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsBusinessException() {
 		// @formatter:off
 		var cidadesDTO = Arrays.asList(new CidadeDTO[] { 
 				CidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
@@ -383,7 +384,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.of(new Cidade()));
 		// @formatter:on
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.adicionarLista(cidadesDTO);
 		});
 
@@ -392,7 +393,7 @@ public class CidadesServiceImplTest {
 	}
 
 	@Test
-	void givenListOfCidadeDTO_withAnyItemHasEstadoIdInexistente_whenAdicionarLista_thenThrowsNegocioException() {
+	void givenListOfCidadeDTO_withAnyItemHasEstadoIdInexistente_whenAdicionarLista_thenThrowsBusinessException() {
 		var estado = new Estado();
 		// @formatter:off
 		var cidadesDTO = Arrays.asList(new CidadeDTO[] { 
@@ -408,7 +409,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		assertThrows(NegocioException.class, () -> {
+		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.adicionarLista(cidadesDTO);
 		});
 

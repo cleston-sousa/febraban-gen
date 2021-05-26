@@ -10,8 +10,8 @@ import br.net.gits.febraban.persistence.entities.Estado;
 import br.net.gits.febraban.persistence.repositories.IEstadosRepository;
 import br.net.gits.febraban.services.IEstadosService;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
-import br.net.gits.febraban.services.exception.NaoEncontradoException;
-import br.net.gits.febraban.services.exception.NegocioException;
+import br.net.gits.febraban.services.exceptions.BusinessException;
+import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
 import br.net.gits.febraban.utils.ModelMapperUtils;
 
 @Service
@@ -30,10 +30,10 @@ public class EstadosServiceImpl implements IEstadosService {
 
 	@Override
 	@Transactional
-	public EstadoDTO salvar(Integer id, EstadoDTO estado) throws NaoEncontradoException {
+	public EstadoDTO salvar(Integer id, EstadoDTO estado) {
 
 		var existente = this.estadosRepository.findById(id)
-				.orElseThrow(() -> new NaoEncontradoException("Estado nao cadastrado"));
+				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));
 
 		estado.setId(null);
 
@@ -46,17 +46,17 @@ public class EstadosServiceImpl implements IEstadosService {
 
 	@Override
 	@Transactional
-	public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) throws NegocioException {
+	public List<EstadoDTO> adicionarLista(List<EstadoDTO> estados) {
 		var resultado = estados.stream().map(item -> this.adicionar(item)).collect(Collectors.toList());
 		return resultado;
 	}
 
 	@Override
 	@Transactional
-	public EstadoDTO adicionar(EstadoDTO estado) throws NegocioException {
+	public EstadoDTO adicionar(EstadoDTO estado) {
 
 		this.estadosRepository.findById(estado.getId()).ifPresent(item -> {
-			throw new NegocioException("Codigo de estado cadastrado");
+			throw new BusinessException("Codigo de estado cadastrado");
 		});
 
 		var novo = ModelMapperUtils.to(estado, Estado.class);
@@ -67,21 +67,21 @@ public class EstadosServiceImpl implements IEstadosService {
 	}
 
 	@Override
-	public EstadoDTO obterPorId(Integer id) throws NaoEncontradoException {
+	public EstadoDTO obterPorId(Integer id) {
 		var existente = this.estadosRepository.findById(id)
-				.orElseThrow(() -> new NaoEncontradoException("Estado nao cadastrado"));
+				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));
 
 		return ModelMapperUtils.to(existente, EstadoDTO.class);
 	}
 
 	@Override
-	public void remover(Integer id) throws NaoEncontradoException, NegocioException {
+	public void remover(Integer id) {
 
 		var existente = this.estadosRepository.findById(id)
-				.orElseThrow(() -> new NaoEncontradoException("Estado nao cadastrado"));
+				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));
 
 		if (existente.getCidade().size() > 0)
-			throw new NegocioException("Estado nao cadastrado");
+			throw new BusinessException("Estado nao cadastrado");
 
 		this.estadosRepository.deleteById(id);
 	}
