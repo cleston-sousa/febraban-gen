@@ -1,11 +1,10 @@
 package br.net.gits.febraban.api.controller;
 
-import static io.restassured.module.mockmvc.RestAssuredMockMvc.given;
+import static org.hamcrest.CoreMatchers.hasItems;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.not;
 
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.not;
-
-import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,32 +24,33 @@ public class EstadosControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
-
+	
 	@BeforeEach
 	public void setup() {
 		RestAssuredMockMvc.mockMvc(this.mockMvc);
 		RestAssuredMockMvc.basePath = "/estados";
+		EstadosServiceStub.reset();
 	}
 
 	@Test
-	public void given_whenListarTodos_thenReturnListOfEstadoResponse() {
+	public void given_with_whenListarTodos_thenReturnListOfEstadoResponse() {
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.accept(ContentType.JSON)
 		.when()
 			.get()
 		.then()
 			.statusCode(HttpStatus.OK.value())
-			.body("", Matchers.hasSize(EstadosServiceStub.estadosRepository.size()))
+			.body("", hasSize(EstadosServiceStub.estadosRepository.size()))
 		;
 		// @formatter:on
 	}
 
 	@Test
-	public void givenEstadoRequest_whenAdicionar_thenReturnEstadoResponse() {
+	public void givenEstadoRequest_with_whenAdicionar_thenReturnEstadoResponse() {
 		var estadoJson = TestUtils.getContentFromResource("/json/estados/inserir_estado.json");
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.body(estadoJson)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
@@ -63,10 +63,10 @@ public class EstadosControllerTest {
 	}
 
 	@Test
-	public void givenEstadoRequestDuplicado_whenAdicionar_thenReturnBadRequest() {
+	public void givenEstadoRequest_withEstadoIdDuplicado_whenAdicionar_thenReturnBadRequest() {
 		var estadoJson = TestUtils.getContentFromResource("/json/estados/inserir_estado_repetido.json");
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.body(estadoJson)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
@@ -76,7 +76,7 @@ public class EstadosControllerTest {
 			.statusCode(HttpStatus.CREATED.value())
 		;
 
-		given()
+		RestAssuredMockMvc.given()
 			.body(estadoJson)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
@@ -89,10 +89,10 @@ public class EstadosControllerTest {
 	}
 
 	@Test
-	public void givenEstadoRequest_whenObterPorId_thenReturnEstadoResponse() {
+	public void givenEstadoRequest_withEstadoIdValido_whenObterPorId_thenReturnEstadoResponse() {
 		var estado = EstadosServiceStub.estadosRepository.get(0);
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.accept(ContentType.JSON)
 		.when()
 			.get("/{estadoId}", estado.getId())
@@ -104,9 +104,9 @@ public class EstadosControllerTest {
 	}
 
 	@Test
-	public void givenEstadoRequest_whenObterPorId_thenReturnNotFound() {
+	public void givenEstadoRequest_withEstadoIdInvalido_whenObterPorId_thenReturnNotFound() {
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.accept(ContentType.JSON)
 		.when()
 			.get("/{estadoId}", 9999)
@@ -117,12 +117,12 @@ public class EstadosControllerTest {
 	}
 
 	@Test
-	public void givenEstadoRequest_whenAlterar_thenReturnEstadoResponse() {
+	public void givenEstadoRequest_withEstadoIdValido_whenAlterar_thenReturnEstadoResponse() {
 		var estado = EstadosServiceStub.estadosRepository.get(0);
 		var nomeAntigo = estado.getNome();
 		var estadoJson = TestUtils.getContentFromResource("/json/estados/alterar_estado.json");
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.body(estadoJson)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
@@ -136,10 +136,10 @@ public class EstadosControllerTest {
 	}
 
 	@Test
-	public void givenEstadoRequest_whenAlterar_thenReturnNotFound() {
+	public void givenEstadoRequest_withEstadoIdInvalido_whenAlterar_thenReturnNotFound() {
 		var estadoJson = TestUtils.getContentFromResource("/json/estados/alterar_estado.json");
 		// @formatter:off
-		given()
+		RestAssuredMockMvc.given()
 			.body(estadoJson)
 			.contentType(ContentType.JSON)
 			.accept(ContentType.JSON)
@@ -151,4 +151,33 @@ public class EstadosControllerTest {
 		// @formatter:on
 	}
 
+	@Test
+	public void givenEstadoCodigo_withEstadoCodigoValido_whenObterPorCodigo_thenReturnEstadoResponse() {
+		
+		// @formatter:off
+		RestAssuredMockMvc.given()
+			.accept(ContentType.JSON)
+		.when()
+			.get("/codigo/{estadoCodigo}", "SP")
+		.then()
+			.statusCode(HttpStatus.OK.value())
+			.body("cidade.nome", hasItems("Auriflama","Adamantina","São Paulo"))
+		;
+		// @formatter:on
+	}
+
+	@Test
+	public void givenEstadoNome_withLetrasMaiusculasEMinusculas_whenObterPorNome_thenReturnEstadoResponse() {
+		// @formatter:off
+		RestAssuredMockMvc.given()
+			.accept(ContentType.JSON)
+		.when()
+			.get("/nome/{estadoNome}", "IO")
+		.then()
+			.statusCode(HttpStatus.OK.value())
+			.body("", hasSize(3))
+			.body("nome", hasItems("Rio de Janeiro", "Rio Grande do Norte","Rio Grande do Sul"))
+		;
+		// @formatter:on
+	}
 }

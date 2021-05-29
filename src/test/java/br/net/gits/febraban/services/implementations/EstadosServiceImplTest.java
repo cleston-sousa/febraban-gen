@@ -23,6 +23,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import br.net.gits.febraban.persistence.entities.Cidade;
 import br.net.gits.febraban.persistence.entities.Estado;
 import br.net.gits.febraban.persistence.repositories.IEstadosRepository;
+import br.net.gits.febraban.services.dtos.AdicionarEstadoDTO;
+import br.net.gits.febraban.services.dtos.AlterarEstadoDTO;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
 import br.net.gits.febraban.services.exceptions.BusinessException;
 import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
@@ -52,7 +54,7 @@ public class EstadosServiceImplTest {
 		// @formatter:on
 
 		var estadoId = 100;
-		var estadoDTO = EstadoDTO.builder().id(estadoId).codigo("TT").nome("Teste").build();
+		var estadoDTO = AdicionarEstadoDTO.builder().id(estadoId).codigo("TT").nome("Teste").build();
 
 		var result = this.estadosService.adicionar(estadoDTO);
 
@@ -71,7 +73,7 @@ public class EstadosServiceImplTest {
 			.thenReturn(Optional.of(new Estado()));
 		// @formatter:on
 
-		var estadoDTO = EstadoDTO.builder().id(1).codigo("TT").nome("Teste").build();
+		var estadoDTO = AdicionarEstadoDTO.builder().id(1).codigo("TT").nome("Teste").build();
 
 		assertThrows(BusinessException.class, () -> {
 			this.estadosService.adicionar(estadoDTO);
@@ -111,7 +113,7 @@ public class EstadosServiceImplTest {
 		// @formatter:on
 
 		var estadoId = 100;
-		var estadoDTO = EstadoDTO.builder().codigo("TT").nome("Teste").build();
+		var estadoDTO = AlterarEstadoDTO.builder().codigo("TT").nome("Teste").build();
 
 		var result = this.estadosService.salvar(estadoId, estadoDTO);
 
@@ -131,7 +133,7 @@ public class EstadosServiceImplTest {
 		// @formatter:on
 
 		var estadoId = 100;
-		var estadoDTO = EstadoDTO.builder().codigo("TT").nome("Teste").build();
+		var estadoDTO = AlterarEstadoDTO.builder().codigo("TT").nome("Teste").build();
 
 		assertThrows(EntityNotFoundException.class, () -> {
 			this.estadosService.salvar(estadoId, estadoDTO);
@@ -144,10 +146,10 @@ public class EstadosServiceImplTest {
 	@Test
 	void givenListOfEstadoDTO_whenAdicionarLista_thenReturnListOfEstadoDTO() {
 		// @formatter:off
-		var estadosDTO = Arrays.asList(new EstadoDTO[] { 
-				EstadoDTO.builder().build(),
-				EstadoDTO.builder().build(),
-				EstadoDTO.builder().build() });
+		var estadosDTO = Arrays.asList(new AdicionarEstadoDTO[] { 
+				AdicionarEstadoDTO.builder().build(),
+				AdicionarEstadoDTO.builder().build(),
+				AdicionarEstadoDTO.builder().build() });
 
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.empty());
@@ -168,10 +170,10 @@ public class EstadosServiceImplTest {
 	@Test
 	void givenListOfEstadoDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsBusinessException() {
 		// @formatter:off
-		var estadosDTO = Arrays.asList(new EstadoDTO[] { 
-				EstadoDTO.builder().build(),
-				EstadoDTO.builder().build(),
-				EstadoDTO.builder().build() });
+		var estadosDTO = Arrays.asList(new AdicionarEstadoDTO[] { 
+				AdicionarEstadoDTO.builder().build(),
+				AdicionarEstadoDTO.builder().build(),
+				AdicionarEstadoDTO.builder().build() });
 
 		when(this.estadosRepository.findById(any()))
 			.thenReturn(Optional.empty())

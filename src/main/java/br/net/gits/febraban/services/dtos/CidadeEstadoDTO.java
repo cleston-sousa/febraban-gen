@@ -11,10 +11,12 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CidadeDTO {
+public class CidadeEstadoDTO {
 
 	private Integer id;
 
 	private String nome;
+
+	private EstadoDTO estado;
 
 }

@@ -1,20 +1,15 @@
 package br.net.gits.febraban.api.controller.model;
 
-import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class EstadoResponse {
+public class CidadeResponse {
 
 	private Integer id;
 
-	private String codigo;
-
 	private String nome;
 
-	private List<CidadeResponse> cidade;
-
+	private EstadoResponse estado;
 }

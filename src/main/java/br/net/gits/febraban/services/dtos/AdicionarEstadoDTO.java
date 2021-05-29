@@ -5,15 +5,19 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CidadeDTO {
+@ToString
+public class AdicionarEstadoDTO {
 
 	private Integer id;
+
+	private String codigo;
 
 	private String nome;
 

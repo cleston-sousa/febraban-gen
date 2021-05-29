@@ -24,6 +24,8 @@ import br.net.gits.febraban.persistence.entities.Cidade;
 import br.net.gits.febraban.persistence.entities.Estado;
 import br.net.gits.febraban.persistence.repositories.ICidadesRepository;
 import br.net.gits.febraban.persistence.repositories.IEstadosRepository;
+import br.net.gits.febraban.services.dtos.AdicionarCidadeDTO;
+import br.net.gits.febraban.services.dtos.AlterarCidadeDTO;
 import br.net.gits.febraban.services.dtos.CidadeDTO;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
 import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
@@ -112,8 +114,8 @@ public class CidadesServiceImplTest {
 		// @formatter:on
 
 		var cidadeId = 100;
-		var cidadeDTO = CidadeDTO.builder().id(cidadeId).nome("Teste")
-					.estado(EstadoDTO.builder().id(estadoId).build()).build();
+		var cidadeDTO = AdicionarCidadeDTO.builder().id(cidadeId).nome("Teste")
+				.estado(EstadoDTO.builder().id(estadoId).build()).build();
 
 		var result = this.cidadesService.adicionar(cidadeDTO);
 
@@ -132,7 +134,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.of(new Cidade()));
 		// @formatter:on
 
-		var cidadeDTO = CidadeDTO.builder().id(1).nome("Teste").build();
+		var cidadeDTO = AdicionarCidadeDTO.builder().id(1).nome("Teste").build();
 
 		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.adicionar(cidadeDTO);
@@ -151,7 +153,8 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		var cidadeDTO = CidadeDTO.builder().id(1).nome("Teste").estado(EstadoDTO.builder().id(2).build()).build();
+		var cidadeDTO = AdicionarCidadeDTO.builder().id(1).nome("Teste").estado(EstadoDTO.builder().id(2).build())
+				.build();
 
 		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.adicionar(cidadeDTO);
@@ -178,7 +181,8 @@ public class CidadesServiceImplTest {
 		// @formatter:on
 
 		var cidadeId = 100;
-		var cidadeDTO = CidadeDTO.builder().nome("Teste").estado(EstadoDTO.builder().id(estadoId).build()).build();
+		var cidadeDTO = AlterarCidadeDTO.builder().nome("Teste").estado(EstadoDTO.builder().id(estadoId).build())
+				.build();
 
 		var result = this.cidadesService.salvar(cidadeId, cidadeDTO);
 
@@ -201,7 +205,7 @@ public class CidadesServiceImplTest {
 		// @formatter:on
 
 		var cidadeId = 100;
-		var cidadeDTO = CidadeDTO.builder().nome("Teste").build();
+		var cidadeDTO = AlterarCidadeDTO.builder().nome("Teste").build();
 		assertThrows(EntityNotFoundException.class, () -> {
 			this.cidadesService.salvar(cidadeId, cidadeDTO);
 		});
@@ -225,7 +229,8 @@ public class CidadesServiceImplTest {
 		// @formatter:on
 
 		var cidadeId = 100;
-		var cidadeDTO = CidadeDTO.builder().nome("Teste").estado(EstadoDTO.builder().id(estadoId).build()).build();
+		var cidadeDTO = AlterarCidadeDTO.builder().nome("Teste").estado(EstadoDTO.builder().id(estadoId).build())
+				.build();
 
 		assertThrows(BusinessException.class, () -> {
 			this.cidadesService.salvar(cidadeId, cidadeDTO);
@@ -346,10 +351,10 @@ public class CidadesServiceImplTest {
 	void givenListOfCidadeDTO_whenAdicionarLista_thenReturnListOfCidadeDTO() {
 		var estado = new Estado();
 		// @formatter:off
-		var cidadesDTO = Arrays.asList(new CidadeDTO[] { 
-				CidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
-				CidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
-				CidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
+		var cidadesDTO = Arrays.asList(new AdicionarCidadeDTO[] { 
+				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
+				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
+				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
 
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());
@@ -374,10 +379,10 @@ public class CidadesServiceImplTest {
 	@Test
 	void givenListOfCidadeDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsBusinessException() {
 		// @formatter:off
-		var cidadesDTO = Arrays.asList(new CidadeDTO[] { 
-				CidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
-				CidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
-				CidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
+		var cidadesDTO = Arrays.asList(new AdicionarCidadeDTO[] { 
+				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
+				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
+				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
 		
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty())
@@ -403,10 +408,10 @@ public class CidadesServiceImplTest {
 	void givenListOfCidadeDTO_withAnyItemHasEstadoIdInexistente_whenAdicionarLista_thenThrowsBusinessException() {
 		var estado = new Estado();
 		// @formatter:off
-		var cidadesDTO = Arrays.asList(new CidadeDTO[] { 
-				CidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
-				CidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
-				CidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
+		var cidadesDTO = Arrays.asList(new AdicionarCidadeDTO[] { 
+				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
+				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
+				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
 
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());

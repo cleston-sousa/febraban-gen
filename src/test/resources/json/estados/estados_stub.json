@@ -1,0 +1,37 @@
+[
+    {
+        "nome": "Rio Grande do Norte",
+        "id": 24,
+        "codigo": "RN"
+    },
+    {
+        "nome": "Rio Grande do Sul",
+        "id": 43,
+        "codigo": "RS"
+    },
+    {
+        "nome": "Rio de Janeiro",
+        "id": 33,
+        "codigo": "RJ"
+    },
+    {
+        "nome": "Rondônia",
+        "id": 11,
+        "codigo": "RO"
+    },
+    {
+        "nome": "Roraima",
+        "id": 14,
+        "codigo": "RR"
+    },
+    {
+        "nome": "Santa Catarina",
+        "id": 42,
+        "codigo": "SC"
+    },
+    {
+        "nome": "São Paulo",
+        "id": 35,
+        "codigo": "SP"
+    }
+]
