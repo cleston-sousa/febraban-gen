@@ -1,5 +1,6 @@
 package br.net.gits.febraban.services;
 
+import java.io.InputStream;
 import java.util.List;
 
 import br.net.gits.febraban.services.dtos.AdicionarCidadeDTO;
@@ -31,4 +32,6 @@ public interface ICidadesService {
 	public void remover(Integer cidadeId) throws EntityNotFoundException;
 
 	public List<CidadeDTO> adicionarLista(List<AdicionarCidadeDTO> listCidadeDTO) throws BusinessException;
+
+	public List<CidadeDTO> importarArquivoTamanhoFixo(InputStream arquivoInputStream) throws BusinessException;
 }

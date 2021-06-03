@@ -4,6 +4,9 @@ import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.Matchers.empty;
 
+import java.io.File;
+import java.io.IOException;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,17 +46,17 @@ class CidadesControllerTest {
 		;
 		// @formatter:on
 	}
-	
+
 	@Test
 	public void givenEstadoId_withCodigoInvalido_whenListarTodas_thenReturnEmptyList() {
 		// @formatter:off
 		RestAssuredMockMvc.given()
-		.accept(ContentType.JSON)
+			.accept(ContentType.JSON)
 		.when()
-		.get("/estado/{estadoId}", 99)
+			.get("/estado/{estadoId}", 99)
 		.then()
-		.statusCode(HttpStatus.OK.value())
-		.body("", empty())
+			.statusCode(HttpStatus.OK.value())
+			.body("", empty())
 		;
 		// @formatter:on
 	}
@@ -62,12 +65,12 @@ class CidadesControllerTest {
 	public void givenCidadeId_withIdValido_whenObterPorId_thenReturnCidadeResponse() {
 		// @formatter:off
 		RestAssuredMockMvc.given()
-		.accept(ContentType.JSON)
+			.accept(ContentType.JSON)
 		.when()
-		.get("/{cidadeId}", 3557154)
+			.get("/{cidadeId}", 3557154)
 		.then()
-		.statusCode(HttpStatus.OK.value())
-		.body("nome", equalTo("Zacarias"))
+			.statusCode(HttpStatus.OK.value())
+			.body("nome", equalTo("Zacarias"))
 		;
 		// @formatter:on
 	}
@@ -76,13 +79,31 @@ class CidadesControllerTest {
 	public void givenCidadeId_withIdInvalido_whenObterPorId_thenReturnNotFound() {
 		// @formatter:off
 		RestAssuredMockMvc.given()
-		.accept(ContentType.JSON)
+			.accept(ContentType.JSON)
 		.when()
-		.get("/{cidadeId}", 999999)
+			.get("/{cidadeId}", 999999)
 		.then()
-		.statusCode(HttpStatus.NOT_FOUND.value())
+			.statusCode(HttpStatus.NOT_FOUND.value())
 		;
 		// @formatter:on
+	}
+
+	@Test
+	public void givenArquivoDeCidades_with_whenImportarArquivo_thenReturnListOfCidadeResponse() throws IOException {
+		ClassLoader classLoader = getClass().getClassLoader();
+		var arquivoCidade = new File(classLoader.getResource("fixedlength/cidade").getPath());
+
+		// @formatter:off
+		RestAssuredMockMvc.given()
+			.multiPart("arquivo", arquivoCidade)
+		.when()
+			.post("/importar")
+		.then()
+			.statusCode(HttpStatus.CREATED.value())
+			.body("nome", hasItems("Santa Rita do Passa Quatro"))
+		;
+		// @formatter:on
+
 	}
 
 }

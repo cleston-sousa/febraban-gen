@@ -1,5 +1,7 @@
 package br.net.gits.febraban.api.controller.stub;
 
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -10,12 +12,14 @@ import org.springframework.context.annotation.Bean;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import br.net.gits.FixedLengthReader;
 import br.net.gits.febraban.api.controller.utils.TestUtils;
 import br.net.gits.febraban.persistence.entities.Cidade;
 import br.net.gits.febraban.persistence.entities.Estado;
 import br.net.gits.febraban.services.ICidadesService;
 import br.net.gits.febraban.services.dtos.AdicionarCidadeDTO;
 import br.net.gits.febraban.services.dtos.AlterarCidadeDTO;
+import br.net.gits.febraban.services.dtos.ArquivoCidadeDTO;
 import br.net.gits.febraban.services.dtos.CidadeDTO;
 import br.net.gits.febraban.services.dtos.CidadeEstadoDTO;
 import br.net.gits.febraban.services.dtos.EstadoIdDTO;
@@ -146,6 +150,30 @@ public class CidadesServiceStub {
 							.filter(item -> StringUtils.containsIgnoreCase(item.getNome(), trimmed))
 							.collect(Collectors.toList());
 					return ModelMapperUtils.toList(cidadesEncontrado, CidadeDTO.class);
+				}
+
+				@Override
+				public List<CidadeDTO> importarArquivoTamanhoFixo(InputStream arquivoInputStream)
+						throws BusinessException {
+					List<CidadeDTO> result = new ArrayList<CidadeDTO>();
+					int linha = 0;
+					try {
+						var reader = FixedLengthReader.init().input(arquivoInputStream).mapper(ArquivoCidadeDTO.class)
+								.open();
+						while (reader.hasNext()) {
+							var extraido = (ArquivoCidadeDTO) reader.read();
+							linha = reader.getLine();
+							var cidade = ModelMapperUtils.to(extraido, AdicionarCidadeDTO.class);
+							cidade.setEstado(new EstadoIdDTO());
+							cidade.getEstado().setId(extraido.getEstado());
+							result.add(this.adicionar(cidade));
+						}
+					} catch (BusinessException e) {
+						throw new BusinessException(String.format("Erro na linha %d", linha), e);
+					} catch (Exception e) {
+						throw new BusinessException("Erro processando o arquivo", e);
+					}
+					return result;
 				}
 			};
 		return this.stub;

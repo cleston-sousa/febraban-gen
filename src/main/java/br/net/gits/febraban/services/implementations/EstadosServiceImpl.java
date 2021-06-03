@@ -67,6 +67,7 @@ public class EstadosServiceImpl implements IEstadosService {
 	}
 
 	@Override
+	@Transactional
 	public void remover(Integer estadoId) {
 		var estadoPersisted = this.estadosRepository.findById(estadoId)
 				.orElseThrow(() -> new EntityNotFoundException("Estado nao cadastrado"));

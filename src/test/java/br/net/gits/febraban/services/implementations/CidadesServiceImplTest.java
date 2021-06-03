@@ -1,7 +1,6 @@
 package br.net.gits.febraban.services.implementations;
 
 import static org.assertj.core.api.Assertions.assertThat;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -10,6 +9,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -28,8 +28,9 @@ import br.net.gits.febraban.services.dtos.AdicionarCidadeDTO;
 import br.net.gits.febraban.services.dtos.AlterarCidadeDTO;
 import br.net.gits.febraban.services.dtos.CidadeDTO;
 import br.net.gits.febraban.services.dtos.EstadoDTO;
-import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
+import br.net.gits.febraban.services.dtos.EstadoIdDTO;
 import br.net.gits.febraban.services.exceptions.BusinessException;
+import br.net.gits.febraban.services.exceptions.EntityNotFoundException;
 
 @ExtendWith(MockitoExtension.class)
 public class CidadesServiceImplTest {
@@ -115,7 +116,7 @@ public class CidadesServiceImplTest {
 
 		var cidadeId = 100;
 		var cidadeDTO = AdicionarCidadeDTO.builder().id(cidadeId).nome("Teste")
-				.estado(EstadoDTO.builder().id(estadoId).build()).build();
+				.estado(EstadoIdDTO.builder().id(estadoId).build()).build();
 
 		var result = this.cidadesService.adicionar(cidadeDTO);
 
@@ -153,7 +154,7 @@ public class CidadesServiceImplTest {
 			.thenReturn(Optional.empty());
 		// @formatter:on
 
-		var cidadeDTO = AdicionarCidadeDTO.builder().id(1).nome("Teste").estado(EstadoDTO.builder().id(2).build())
+		var cidadeDTO = AdicionarCidadeDTO.builder().id(1).nome("Teste").estado(EstadoIdDTO.builder().id(2).build())
 				.build();
 
 		assertThrows(BusinessException.class, () -> {
@@ -352,9 +353,9 @@ public class CidadesServiceImplTest {
 		var estado = new Estado();
 		// @formatter:off
 		var cidadesDTO = Arrays.asList(new AdicionarCidadeDTO[] { 
-				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
-				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
-				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
+				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoIdDTO.builder().id(55).build()).build(),
+				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoIdDTO.builder().id(66).build()).build(),
+				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoIdDTO.builder().id(77).build()).build() });
 
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());
@@ -380,9 +381,9 @@ public class CidadesServiceImplTest {
 	void givenListOfCidadeDTO_withAnyItemHasIdRepetido_whenAdicionarLista_thenThrowsBusinessException() {
 		// @formatter:off
 		var cidadesDTO = Arrays.asList(new AdicionarCidadeDTO[] { 
-				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
-				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
-				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
+				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoIdDTO.builder().id(55).build()).build(),
+				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoIdDTO.builder().id(66).build()).build(),
+				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoIdDTO.builder().id(77).build()).build() });
 		
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty())
@@ -409,9 +410,9 @@ public class CidadesServiceImplTest {
 		var estado = new Estado();
 		// @formatter:off
 		var cidadesDTO = Arrays.asList(new AdicionarCidadeDTO[] { 
-				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoDTO.builder().id(55).build()).build(),
-				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoDTO.builder().id(66).build()).build(),
-				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoDTO.builder().id(77).build()).build() });
+				AdicionarCidadeDTO.builder().id(1).nome("Teste1").estado(EstadoIdDTO.builder().id(55).build()).build(),
+				AdicionarCidadeDTO.builder().id(2).nome("Teste2").estado(EstadoIdDTO.builder().id(66).build()).build(),
+				AdicionarCidadeDTO.builder().id(3).nome("Teste3").estado(EstadoIdDTO.builder().id(77).build()).build() });
 
 		when(this.cidadesRepository.findById(any()))
 			.thenReturn(Optional.empty());
@@ -431,6 +432,64 @@ public class CidadesServiceImplTest {
 		verify(this.cidadesRepository, times(2)).findById(any());
 		verify(this.estadosRepository, times(2)).findById(any());
 		verify(this.cidadesRepository, times(1)).save(any());
+	}
+
+	@Test
+	void givenFileArquivoCidadeDTO_whenImportarArquivoTamanhoFixo_thenReturnListOfCidadeDTO() throws IOException {
+		// @formatter:off
+		when(this.cidadesRepository.findById(any()))
+			.thenReturn(Optional.empty());
+		
+		when(this.estadosRepository.findById(any()))
+			.thenReturn(Optional.of(new Estado()));
+		
+		when(this.cidadesRepository.save(any()))
+			.then(invocation -> {
+				return invocation.getArgument(0);
+			});
+		// @formatter:on
+
+		ClassLoader classLoader = getClass().getClassLoader();
+		var arquivoCidadeFixedLength = classLoader.getResource("fixedlength/cidade").openStream();
+
+		var result = this.cidadesService.importarArquivoTamanhoFixo(arquivoCidadeFixedLength);
+
+		verify(this.cidadesRepository, times(2)).save(any());
+
+		assertThat(result).hasSize(2);
+		assertThat(result.get(0)).isInstanceOf(CidadeDTO.class);
+		assertThat(result.get(0).getNome()).isEqualTo("Santa Rita do Passa Quatro");
+
+	}
+
+	@Test
+	void givenFileArquivoCidadeDTO_withIdDuplicado_whenImportarArquivoTamanhoFixo_thenThrowsBusinessException()
+			throws IOException {
+		// @formatter:off
+		when(this.cidadesRepository.findById(any()))
+			.thenReturn(Optional.empty())
+			.thenReturn(Optional.of(new Cidade()));
+	
+		when(this.estadosRepository.findById(any()))
+			.thenReturn(Optional.of(new Estado()));
+		
+		when(this.cidadesRepository.save(any()))
+			.then(invocation -> {
+				return invocation.getArgument(0);
+			});
+		// @formatter:on
+
+		ClassLoader classLoader = getClass().getClassLoader();
+		var arquivoCidadeFixedLength = classLoader.getResource("fixedlength/cidade").openStream();
+
+		assertThrows(BusinessException.class, () -> {
+			this.cidadesService.importarArquivoTamanhoFixo(arquivoCidadeFixedLength);
+		});
+
+		verify(this.cidadesRepository, times(2)).findById(any());
+		verify(this.estadosRepository, times(1)).findById(any());
+		verify(this.cidadesRepository, times(1)).save(any());
+
 	}
 
 }
